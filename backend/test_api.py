@@ -39,6 +39,21 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(body["record_count"], 1)
         self.assertEqual(len(body["batch_hash"]), 64)
 
+    def test_readings_endpoint(self):
+        self.client.post(
+            "/ingest",
+            json={
+                "device_id": "stm32-02",
+                "timestamp": 1730000002,
+                "temperature_c": 22.0,
+                "humidity_pct": 50.0,
+            },
+        )
+        response = self.client.get("/readings?limit=5")
+        self.assertEqual(response.status_code, 200)
+        items = response.json()["items"]
+        self.assertGreaterEqual(len(items), 1)
+
     def test_invalid_payload_rejected(self):
         response = self.client.post(
             "/ingest",

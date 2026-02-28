@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monad IoT Dashboard</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Monad IoT Dashboard (MVP)</h1>
+      <p class="muted">STM32 + DHT22 verisini backend'e gönder, son kayıtları izle, batch hash üret.</p>
+
+      <section class="card">
+        <h2>Backend ayarı</h2>
+        <label>
+          Backend URL
+          <input id="backendUrl" value="http://127.0.0.1:8000" />
+        </label>
+        <button id="saveUrl">Kaydet</button>
+      </section>
+
+      <section class="grid">
+        <form class="card" id="ingestForm">
+          <h2>Veri Gönder (/ingest)</h2>
+          <label>Device ID <input name="device_id" value="stm32-01" required /></label>
+          <label>Timestamp (epoch) <input name="timestamp" type="number" required /></label>
+          <label>Sıcaklık °C <input name="temperature_c" type="number" step="0.1" value="24.5" required /></label>
+          <label>Nem % <input name="humidity_pct" type="number" step="0.1" value="55.0" required /></label>
+          <button type="submit">Gönder</button>
+          <pre id="ingestResult" class="result"></pre>
+        </form>
+
+        <form class="card" id="anchorForm">
+          <h2>Batch Hash Üret (/anchor-batch)</h2>
+          <label>Start TS <input name="start_ts" type="number" value="0" required /></label>
+          <label>End TS <input name="end_ts" type="number" value="9999999999" required /></label>
+          <button type="submit">Batch Hash Üret</button>
+          <pre id="anchorResult" class="result"></pre>
+        </form>
+      </section>
+
+      <section class="card">
+        <div class="between">
+          <h2>Son Kayıtlar (/readings?limit=10)</h2>
+          <button id="refreshReadings">Yenile</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Device</th>
+              <th>Timestamp</th>
+              <th>Temp</th>
+              <th>Humidity</th>
+              <th>Hash</th>
+            </tr>
+          </thead>
+          <tbody id="readingsBody"></tbody>
+        </table>
+      </section>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>

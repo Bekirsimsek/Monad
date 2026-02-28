@@ -5,6 +5,7 @@ from pathlib import Path
 import sqlite3
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from backend.core import SensorRecord, payload_hash_hex, validate_record
@@ -13,6 +14,13 @@ DB_PATH = Path(__file__).resolve().parent / "sensor_data.db"
 ANCHOR_LOG = Path(__file__).resolve().parent / "anchor_log.txt"
 
 app = FastAPI(title="Monad IoT MVP", version="0.1.0")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class SensorIn(BaseModel):
@@ -128,3 +136,21 @@ def anchor_batch(req: BatchAnchorRequest) -> dict[str, str | int]:
         "batch_hash": batch_hash,
         "note": "MVP: bu hash Monad testnet'e yazılacak veri olarak hazırlandı",
     }
+
+
+@app.get("/readings")
+def readings(limit: int = 10) -> dict[str, list[dict[str, str | int | float]]]:
+    safe_limit = max(1, min(limit, 100))
+    with _db() as conn:
+        rows = conn.execute(
+            """
+            SELECT id, device_id, timestamp, temperature_c, humidity_pct, payload_hash, created_at
+            FROM sensor_readings
+            ORDER BY id DESC
+            LIMIT ?
+            """,
+            (safe_limit,),
+        ).fetchall()
+
+    items = [dict(row) for row in rows]
+    return {"items": items}

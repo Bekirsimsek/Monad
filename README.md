@@ -170,3 +170,43 @@ Komutu tekrar çalıştır ve ikinci yanıtta 409 bekle.
 - `Connection refused`: `uvicorn` çalışmıyor.
 - `404 range içinde kayıt bulunamadı`: Verilen zaman aralığında kayıt yok.
 - GitHub'da görünmeme: commit sonrası branch'i push et (`git push -u origin <branch-adi>`).
+
+## Frontend (Dashboard) kurulumu
+
+`frontend/` klasöründe basit bir dashboard var. Bu arayüz ile:
+- `/ingest` endpoint'ine manuel veri gönderirsin,
+- `/readings` ile son kayıtları görürsün,
+- `/anchor-batch` ile batch hash üretirsin.
+
+### Frontend'i çalıştır
+
+Terminal-1 (backend):
+
+```bash
+source .venv/bin/activate
+uvicorn backend.app:app --reload
+```
+
+Terminal-2 (frontend static server):
+
+```bash
+python3 -m http.server 5500 -d frontend
+```
+
+Tarayıcıdan aç:
+
+```text
+http://127.0.0.1:5500
+```
+
+### Backend ile nasıl birleştireceksin?
+
+1. Dashboard'da üstteki **Backend URL** alanına backend adresini yaz:
+   - Lokal için: `http://127.0.0.1:8000`
+   - Sunucu için: `https://senin-api-domainin.com`
+2. **Kaydet** butonuna bas (localStorage'a kaydolur).
+3. "Veri Gönder" formunu doldurup gönder; sonuç panelinde API cevabını gör.
+4. "Son Kayıtlar" bölümünde **Yenile** ile DB'ye düşen kayıtları kontrol et.
+5. "Batch Hash Üret" formuyla zaman aralığı verip hash üret.
+
+Not: `backend/app.py` içinde CORS açık (`allow_origins=["*"]`), bu yüzden frontend farklı portta çalışsa da çağrı yapabilir.
