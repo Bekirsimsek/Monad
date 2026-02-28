@@ -45,3 +45,36 @@ curl -X POST http://127.0.0.1:8000/anchor-batch \
 - Postgres/TimescaleDB'ye geçiş
 - Monad testnet'e gerçek transaction gönderen worker
 - Grafana dashboard
+
+## GitHub'da neden görünmüyor?
+
+Genelde sebep kodun sadece lokal branch'te commitli kalmasıdır. Aşağıdaki adımları çalıştır:
+
+```bash
+git status
+git branch --show-current
+git remote -v
+git push -u origin <branch-adi>
+```
+
+Eğer GitHub'da PR açılmadıysa, branch push edildikten sonra web arayüzünden Compare & Pull Request ile açabilirsin.
+
+## Donanım olmadan test (STM32 + DHT22 bağlı değilken)
+
+Evet, donanım olmadan da test edebilirsin:
+
+1. Unit testler:
+
+```bash
+python3 -m unittest backend/test_core.py
+python3 -m unittest backend/test_api.py
+```
+
+2. API'yi ayağa kaldırıp simülatörle sahte sensör verisi gönder:
+
+```bash
+uvicorn backend.app:app --reload
+python3 scripts/simulate_device.py --url http://127.0.0.1:8000/ingest --device-id stm32-01
+```
+
+Bu şekilde tüm ingest + hash + batch akışını gerçek sensör olmadan doğrulamış olursun.
