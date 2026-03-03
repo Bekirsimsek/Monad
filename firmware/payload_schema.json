@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "STM32 DHT22 Payload",
+  "type": "object",
+  "required": ["device_id", "timestamp", "temperature_c", "humidity_pct"],
+  "properties": {
+    "device_id": { "type": "string", "minLength": 1 },
+    "timestamp": { "type": "integer", "minimum": 0 },
+    "temperature_c": { "type": "number", "minimum": -40, "maximum": 80 },
+    "humidity_pct": { "type": "number", "minimum": 0, "maximum": 100 }
+  },
+  "additionalProperties": false
+}
